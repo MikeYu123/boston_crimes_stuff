@@ -23,7 +23,7 @@ object BostonCrimesMap extends App with SparkSessionWrapper {
     .withColumn("crimes_this_month", count("*").over(Window.partitionBy("DISTRICT", "MONTH", "YEAR")))
     .withColumn("crimes_that_type", count("*").over(Window.partitionBy("CODE", "DISTRICT")))
     .withColumn("crimes_rank", dense_rank().over(Window.partitionBy("DISTRICT").orderBy(-$"crimes_that_type")))
-    .where($"crimes_rank" < 4)
+    .where($"rank" < 4)
     .withColumn("frequent_crimes", array_join(collect_set($"crime_name_shortcut").over(districtWindow), ", "))
     .groupBy("DISTRICT", "MONTH")
     .agg(
